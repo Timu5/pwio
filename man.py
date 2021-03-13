@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor
+from queue import Queue
 
 
 def mandelbrot(x, y, w, h, pixel_density, iterations):
@@ -81,62 +82,72 @@ ycount = 1080 // ysize
 el_width = width / xcount
 el_height = height / ycount
 
-image = None
-# image = mandelbrot(xstart, ystart, width, height, 200, 50)
+plt.ion()
+plt.show()
+
+canvas = np.zeros(shape=(image_height, image_width, 3))
+canvas.fill(1.0)
+
+plt.imshow(canvas)
+plt.draw()
+plt.pause(0.01)
 
 
-# costam = worker(xstart, ystart, width, height, 50, 100)
-# plt.imshow(costam[2])
-
-results = []
-
-with ThreadPoolExecutor() as executor:
-    for y in range(ycount):
-        image_line = None
-        for x in range(xcount):
-            future = executor.submit(worker, xstart + x * el_width, ystart + y *
-                                     el_height, el_width, el_height, xsize // 4, 50)
-
-            results.append(future)
-            '''t = future.result()
-            plt.imshow(t[2])
-            plt.show()'''
-
-    executor.shutdown(True)
+# TODO: optimize this routine
+def blit(dest, src, loc):
+    for j in range(src.shape[0]):
+        for i in range(src.shape[1]):
+            if j+loc[0] < dest.shape[0]:
+                if i+loc[1] < dest.shape[1]:
+                    dest[j+loc[0]][i+loc[1]] = src[j][i]
 
 
-'''for r in results:
-    result = r.result()
+elements = []
+for y in range(ycount):
+    for x in range(xcount):
+        distance = (y-ycount//2)**2 + (x-xcount//2)**2
+        elements.append((distance, x, y))
+elements.sort(key=lambda x: x[0])
+
+
+queue = Queue()
+
+
+def worker_finished(future):
+    queue.put(future.result())
+
+
+parts = 0
+executor = ThreadPoolExecutor()
+for e in elements:
+    x = e[1]
+    y = e[2]
+    future = executor.submit(worker, xstart + x * el_width, ystart + y *
+                             el_height, el_width, el_height, xsize // 4, 120)
+    future.add_done_callback(worker_finished)
+    parts += 1
+
+while(parts > 0):
+    result = queue.get()
+
     x = result[0]
     y = result[1]
 
     co_x = (x - xstart) / width * 1440
     co_y = (y - ystart) / height * 1080
 
-    plt.figure()
-    plt.imshow(result[2])  # , extent=(co_x, co_y, co_x + xsize, co_y + ysize))
-plt.show()'''
+    blit(canvas, result[2], (int(co_y), int(co_x)))
+    plt.clf()
+    plt.imshow(canvas)
 
-image = None
-#image = mandelbrot(xstart, ystart, width, height, 200, 50)
-for y in range(ycount):
-    image_line = None
-    for x in range(xcount):
-        #img_el = mandelbrot(xstart + x * elx, ystart + y * ely, elx, ely, 200, 50)
-        img_el = results[x + y * 3].result()[2]
+    plt.draw()
+    plt.pause(0.01)
 
-        if image_line is None:
-            image_line = img_el
-        else:
-            image_line = np.concatenate((image_line, img_el), axis=1)
+    parts -= 1
 
-    if image is None:
-        image = image_line
-    else:
-        image = np.concatenate((image, image_line))
+executor.shutdown()
 
-plt.imshow(image)
+plt.ioff()
 plt.show()
-#plt.imshow(image, cmap=plt.cm.twilight_shifted)
-# plt.show()
+
 # plt.savefig("Mandelbrot.png", dpi=250)
