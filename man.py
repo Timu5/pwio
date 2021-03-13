@@ -63,21 +63,24 @@ def worker(x, y, w, h, pixel_density, iterations):
     return (x, y, image_test)
 
 
-xstart = -2.5 + 1
-ystart = -1.5 + 1
-width = 4/4
-height = 3/4
+xstart = -2.5 + 1.2
+ystart = -1.5 + 1.05
+width = 4/12
+height = 3/12
 
 '''xstart = -2.5
 ystart = -1.5
 width = 4
 height = 3'''
 
-xsize = 4 * 100
-ysize = 3 * 100
+xsize = 4 * 10 * 5 * 2
+ysize = 3 * 10 * 5 * 2
 
-xcount = 1440 // xsize
-ycount = 1080 // ysize
+image_width = 400 * 5
+image_height = 300 * 5
+
+xcount = image_width // xsize
+ycount = image_height // ysize
 
 el_width = width / xcount
 el_height = height / ycount
@@ -133,8 +136,8 @@ while(parts > 0):
     x = result[0]
     y = result[1]
 
-    co_x = (x - xstart) / width * 1440
-    co_y = (y - ystart) / height * 1080
+    co_x = (x - xstart) / width * image_width
+    co_y = (y - ystart) / height * image_height
 
     blit(canvas, result[2], (int(co_y), int(co_x)))
     plt.clf()
