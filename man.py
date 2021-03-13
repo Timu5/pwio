@@ -53,12 +53,12 @@ def worker(x, y, w, h, pixel_density, iterations):
     t = mandelbrot(x, y, w, h, pixel_density, iterations)
     # convert to image using some nice colors palete
     image_test = np.zeros(shape=(t.shape[0], t.shape[1], 3))
-    for y in range(t.shape[0]):
-        for x in range(t.shape[1]):
-            color = color_interpolation(t[y][x]/iterations)
-            image_test[y][x][0] = color[2]/255  # R
-            image_test[y][x][1] = color[1]/255  # G
-            image_test[y][x][2] = color[0]/255  # B
+    for j in range(t.shape[0]):
+        for i in range(t.shape[1]):
+            color = color_interpolation(t[j][i]/iterations)
+            image_test[j][i][0] = color[0]/255  # R
+            image_test[j][i][1] = color[1]/255  # G
+            image_test[j][i][2] = color[2]/255  # B
     return (x, y, image_test)
 
 
