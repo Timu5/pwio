@@ -136,15 +136,17 @@ def worker_finished(future):
 parts = 0
 executor = ThreadPoolExecutor()
 for e in elements:
-    x = e[1]
-    y = e[2]
+    d, x, y = e
     future = executor.submit(worker, xstart + x * el_width, ystart + y *
-                             el_height, el_width, el_height, xsize // 4, 120)
+                             el_height, el_width, el_height, xsize // 4, 200)
     future.add_done_callback(worker_finished)
     parts += 1
 
+plt.pause(1)
+
 while(parts > 0):
     result = queue.get()
+    parts -= 1
 
     x = result[0]
     y = result[1]
@@ -153,17 +155,22 @@ while(parts > 0):
     co_y = (y - ystart) / height * image_height
 
     blit(canvas, result[2], (int(co_y), int(co_x)))
+
+    if queue.qsize() > 0:
+        continue
+
     plt.clf()
     plt.imshow(canvas)
 
     plt.draw()
     plt.pause(0.01)
 
-    parts -= 1
 
 executor.shutdown()
 
 plt.ioff()
+plt.clf()
+plt.imshow(canvas)
 plt.show()
 
 # plt.savefig("Mandelbrot.png", dpi=250)
