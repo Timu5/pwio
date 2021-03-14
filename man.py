@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor
 from queue import Queue
+import math
 
 
 def mandelbrot(x, y, w, h, pixel_density, iterations):
@@ -98,11 +99,16 @@ plt.pause(0.01)
 
 # TODO: optimize this routine
 def blit(dest, src, loc):
-    for j in range(src.shape[0]):
-        for i in range(src.shape[1]):
-            if j+loc[0] < dest.shape[0]:
-                if i+loc[1] < dest.shape[1]:
-                    dest[j+loc[0]][i+loc[1]] = src[j][i]
+    y, x = loc
+    sy, sx, _ = src.shape
+    dx = sx + x
+    dy = sy + y
+    if dx >= dest.shape[1]:
+        sx -= (dx - dest.shape[1])
+    if dy >= dest.shape[0]:
+        sy -= (dy - dest.shape[0])
+    for j in range(sy):
+        dest[j+loc[0]][loc[1]:loc[1]+sx] = src[j][0:sx]
 
 
 elements = []
