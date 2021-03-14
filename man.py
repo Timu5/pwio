@@ -51,17 +51,22 @@ def color_interpolation(value):
     return colormap[-1][1]
 
 
+def colorize(matrix, iterations):
+    # convert to image using some nice colors palete
+    image = np.zeros(shape=(matrix.shape[0], matrix.shape[1], 3))
+    for j in range(matrix.shape[0]):
+        for i in range(matrix.shape[1]):
+            color = color_interpolation(matrix[j][i]/iterations)
+            image[j][i][0] = color[0]/255  # R
+            image[j][i][1] = color[1]/255  # G
+            image[j][i][2] = color[2]/255  # B
+    return image
+
+
 def worker(x, y, w, h, pixel_density, iterations):
     t = mandelbrot(x, y, w, h, pixel_density, iterations)
-    # convert to image using some nice colors palete
-    image_test = np.zeros(shape=(t.shape[0], t.shape[1], 3))
-    for j in range(t.shape[0]):
-        for i in range(t.shape[1]):
-            color = color_interpolation(t[j][i]/iterations)
-            image_test[j][i][0] = color[0]/255  # R
-            image_test[j][i][1] = color[1]/255  # G
-            image_test[j][i][2] = color[2]/255  # B
-    return (x, y, image_test)
+    image = colorize(t, iterations)
+    return (x, y, image, t)
 
 
 xstart = -2.5 + 1.2
