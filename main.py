@@ -5,6 +5,8 @@ from queue import Queue
 import math
 from man import *
 from executor import *
+import psutil
+from time import perf_counter
 
 xstart = -2.5 + 1.2
 ystart = -1.5 + 1.05
@@ -37,8 +39,6 @@ canvas.fill(1.0)
 
 def on_close(event):
     global parts
-    print("close")
-    plt.close('all')
     parts = -1
 
 
@@ -80,7 +80,12 @@ ex = Executor()
 ex.schedule(queue, elements, xstart, ystart,
             el_width, el_height, xsize // 4, 200)
 
+psutil.cpu_percent(percpu=True)
+starttime = perf_counter()
+
+
 parts = len(elements)
+count = parts
 
 while(parts > 0):
     result = queue.get().result()
@@ -97,11 +102,20 @@ while(parts > 0):
     if queue.qsize() > 0:
         continue
 
+    print(f"\r{count-parts}/{count}", end="")
+
     plt.clf()
     plt.imshow(canvas)
 
     plt.draw()
     plt.pause(0.01)
+
+print()
+print(psutil.cpu_percent(percpu=True))
+
+endtime = perf_counter()
+
+print(f"Time: {endtime - starttime}s")
 
 ex.shutdown()
 
