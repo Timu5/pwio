@@ -108,7 +108,9 @@ def blit(dest, src, loc):
 elements = []
 for y in range(ycount):
     for x in range(xcount):
-        distance = (y-ycount//2)**2 + (x-xcount//2)**2
+        a = abs(y-ycount//2)
+        b = abs(x-xcount//2)
+        distance = max(a, b)
         elements.append((distance, x, y))
 elements.sort(key=lambda x: x[0])
 
