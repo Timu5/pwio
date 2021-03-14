@@ -5,6 +5,7 @@ from queue import Queue
 import math
 from man import *
 from executor import *
+from classic import Classic
 import psutil
 from time import perf_counter
 
@@ -75,7 +76,8 @@ elements.sort(key=lambda x: x[0])
 
 queue = Queue()
 
-ex = Executor()
+#ex = Executor()
+ex = Classic()
 
 ex.schedule(queue, elements, xstart, ystart,
             el_width, el_height, xsize // 4, 200)
@@ -88,7 +90,7 @@ parts = len(elements)
 count = parts
 
 while(parts > 0):
-    result = queue.get().result()
+    result = queue.get()  # .result()
     parts -= 1
 
     x = result[0]
