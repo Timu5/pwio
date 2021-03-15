@@ -50,25 +50,23 @@ plt.draw()
 plt.pause(0.5)
 
 
-# TODO: optimize this routine
 def blit(dest, src, loc):
-    y, x = loc
     sy, sx, _ = src.shape
-    dx = sx + x
-    dy = sy + y
+    dx = sx + loc[1]
+    dy = sy + loc[0]
     if dx >= dest.shape[1]:
         sx -= (dx - dest.shape[1])
     if dy >= dest.shape[0]:
         sy -= (dy - dest.shape[0])
-    for j in range(sy):
-        dest[j+loc[0]][loc[1]:loc[1]+sx] = src[j][0:sx]
+
+    dest[loc[0]:loc[0]+sy,loc[1]:loc[1]+sx,:] = src[:sy,:sx,:]
 
 
 elements = []
 for y in range(ycount):
     for x in range(xcount):
-        a = abs(y-ycount//2)
-        b = abs(x-xcount//2)
+        a = abs(y-ycount/2 + 0.5)
+        b = abs(x-xcount/2 + 0.5)
         distance = max(a, b)
         elements.append((distance, x, y))
 elements.sort(key=lambda x: x[0])
