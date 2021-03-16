@@ -20,7 +20,7 @@ class Executor:
 
     def schedule(self, queue, elements, xstart, ystart, el_width, el_height, pixel_density, iterations):
         self.queue = queue
-        self.executor = ProcessPoolExecutor()
+        self.executor = ThreadPoolExecutor()
         for e in elements:
             d, x, y = e
             future = self.executor.submit(worker, xstart + x * el_width, ystart + y *

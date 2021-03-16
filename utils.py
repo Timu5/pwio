@@ -1,5 +1,6 @@
+from numba import jit
 
-
+@jit(nopython=True, nogil=True)
 def blit(dest, src, loc):
     sy, sx, _ = src.shape
     dx = sx + loc[1]

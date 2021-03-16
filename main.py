@@ -66,8 +66,8 @@ if __name__ == "__main__":
 
     queue = Queue()
 
-    ex = Executor()
-    #ex = Classic()
+    #ex = Executor()
+    ex = Classic()
 
     ex.schedule(queue, elements, xstart, ystart,
                 el_width, el_height, xsize // 16, 40)
@@ -77,6 +77,8 @@ if __name__ == "__main__":
 
     parts = len(elements)
     count = parts
+
+    i = 0
 
     while(parts > 0):
         result = queue.get()
@@ -92,9 +94,13 @@ if __name__ == "__main__":
 
         blit(canvas, result[2], (int(co_y), int(co_x)))
 
-        if queue.qsize() > 0:
-            continue
+        i += 1
 
+        if queue.qsize() > 0 and i < 16:
+            continue
+        
+        i = 0
+        
         print(f"\r{count-parts}/{count}", end="")
 
         draw(canvas)
