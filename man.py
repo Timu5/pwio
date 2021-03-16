@@ -55,7 +55,7 @@ def colorize(matrix, iterations):
     for j in range(matrix.shape[0]):
         for i in range(matrix.shape[1]):
             color = color_interpolation(matrix[j][i]/iterations)
-            image[j][i][0] = color[0]/255  # R
+            image[j][i][0] = color[2]/255  # R
             image[j][i][1] = color[1]/255  # G
-            image[j][i][2] = color[2]/255  # B
+            image[j][i][2] = color[0]/255  # B
     return image

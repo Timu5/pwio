@@ -1,6 +1,7 @@
 import numpy as np
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from man import mandelbrot, colorize
+import os
 
 
 def worker(x, y, w, h, pixel_density, iterations):
@@ -20,7 +21,7 @@ class Executor:
 
     def schedule(self, queue, elements, xstart, ystart, el_width, el_height, pixel_density, iterations):
         self.queue = queue
-        self.executor = ThreadPoolExecutor()
+        self.executor = ThreadPoolExecutor(max_workers=os.cpu_count())
         for e in elements:
             d, x, y = e
             future = self.executor.submit(worker, xstart + x * el_width, ystart + y *
