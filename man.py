@@ -6,8 +6,8 @@ def mandelbrot(x, y, w, h, pixel_density, iterations):
     n = iterations
     r = 2.5  # escape radius (must be greater than 2)
 
-    x = np.linspace(x, x + w, 4 * d + 1)
-    y = np.linspace(y, y + h, 3 * d + 1)
+    x = np.linspace(x, x + w, 16 * d + 1)
+    y = np.linspace(y, y + h, 9 * d + 1)
 
     A, B = np.meshgrid(x, y)
     C = A + B * 1j
