@@ -1,25 +1,34 @@
+import os
+from queue import Queue
+from threading import Thread
+
 from executor import worker
 
 
 class Classic:
 
     def __init__(self):
-        pass
+        self.elements = None
+        self.queue = None
+        self.thread_queue = Queue()
+
+    def run(self, x, y, w, h, pd, i):
+        result = worker(x, y, w, h, pd, i)
+        self.queue.put(result)
+        if self.thread_queue.not_empty:
+            self.thread_queue.get().start()
 
     def schedule(self, queue, elements, xstart, ystart, el_width, el_height, pixel_density, iterations):
-        # queue - place to put calculation result
-        # elements - list of elements for which multi-thread calculations should be done
-        # remaining arguments are passed to worker() function
+        self.queue = queue
+        self.elements = elements
 
-        # use worker() function for calculation
-        # worker() arguments: xstart + x * el_width, ystart + y * el_height, el_width, el_height, pixel_density, iterations
-        # where x and y is second and third tuple element from "elements" array eg. elements[0][1] <- x, elements[0][2] <- y
+        for e in elements:
+            d, x, y = e
+            self.thread_queue.put(Thread(target=self.run, args=(xstart + x * el_width, ystart + y * el_height,
+                                                                el_width, el_height, pixel_density, iterations)))
 
-        # return value from worker() need to be directly put into "queue"
-
-        # spawn at least as many thread as logical cores
-
-        pass
+        for _ in range(min(os.cpu_count(), len(elements))):
+            self.thread_queue.get().start()
 
     def shutdown(self):
         pass
