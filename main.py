@@ -8,17 +8,25 @@ from classic import Classic
 import psutil
 from time import perf_counter
 import cv2
-
+import argparse
 
 def draw(canvas):
-    imscaled = cv2.resize(canvas, (1920//2, 1080//2))
+    imscaled = cv2.resize(canvas, (1270, 720))
     cv2.imshow("Mandelbrot", imscaled)
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Mandelbrot')
+    parser.add_argument('--frag', action="store", dest="frag", type=int, default=20)
+    parser.add_argument('--res', action="store", dest="res", type=int, default=2)
+    parser.add_argument('--fps', action="store", dest="fps", type=int, default=30)
+    parser.add_argument('--iter', action="store", dest="iter", type=int, default=100)
+    parser.add_argument('--executor', action="store_true", dest="executor", default=False)
+    parser.add_argument('--nogui', action="store_true", dest="nogui", default=False)
+    args = parser.parse_args()
 
-    gui = True
-    fps = 30
+    gui = not args.nogui
+    fps = args.fps
 
     xstart = -2.5 + 1.2
     ystart = -1.5 + 1.05
@@ -30,11 +38,11 @@ if __name__ == "__main__":
     width = 4
     height = 3'''
 
-    xsize = 16 * 10 * 2 * 2
-    ysize = 9 * 10 * 2 * 2
+    xsize = 16 * args.frag
+    ysize = 9 * args.frag
 
-    image_width = 1920 * 2 * 2
-    image_height = 1080 * 2 * 2
+    image_width = 1920 * args.res
+    image_height = 1080 * args.res
 
     xcount = image_width // xsize
     ycount = image_height // ysize
@@ -52,15 +60,15 @@ if __name__ == "__main__":
     elements = order2D(xcount, ycount)
 
     queue = Queue()
-
-    #ex = Executor()
     ex = Classic()
+    if args.executor:
+        ex = Executor()
 
     psutil.cpu_percent(percpu=True)
     starttime = perf_counter()
 
     ex.schedule(queue, elements, xstart, ystart,
-                el_width, el_height, xsize // 16, 300)
+                el_width, el_height, xsize // 16, args.iter)
 
     parts = len(elements)
     count = parts
@@ -82,7 +90,7 @@ if __name__ == "__main__":
         blit(canvas, result[2], (int(co_y), int(co_x)))
 
         time = perf_counter()
-        if time - lasttime < 1 / fps:
+        if time - lasttime < 1 / fps and parts != 0:
             continue
 
         lasttime = time
@@ -102,6 +110,5 @@ if __name__ == "__main__":
     ex.shutdown()
 
     if gui:
-        draw(canvas)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
