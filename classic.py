@@ -15,7 +15,7 @@ class Classic:
     def run(self, x, y, w, h, pd, i):
         result = worker(x, y, w, h, pd, i)
         self.queue.put(result)
-        if self.thread_queue.not_empty:
+        if self.thread_queue.qsize() > 0:
             self.thread_queue.get().start()
 
     def schedule(self, queue, elements, xstart, ystart, el_width, el_height, pixel_density, iterations):
