@@ -101,7 +101,9 @@ if __name__ == "__main__":
             cv2.waitKey(1)
 
     print()
-    print(psutil.cpu_percent(percpu=True))
+    load = psutil.cpu_percent(percpu=True)
+    print(f"Cores: {load}%")
+    print(f"CPU: {sum(load)/len(load):.2f}%")
 
     endtime = perf_counter()
 
